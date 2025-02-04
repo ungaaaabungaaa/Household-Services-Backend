@@ -29,6 +29,7 @@ sudo systemctl enable redis-server
 ```bash
 brew install redis
 brew services start redis
+redis-server   
 ```
 
 #### Install Redis (Windows)
@@ -103,11 +104,6 @@ household_services/
 │   ├── customer.py    # Customer endpoints
 │   ├── professional.py # Professional endpoints
 │   └── service.py     # Service endpoints
-└── tests/
-    ├── __init__.py
-    ├── test_auth.py
-    ├── test_admin.py
-    └── test_services.py
 ```
 
 ## Security Features
