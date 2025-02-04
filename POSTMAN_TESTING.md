@@ -132,3 +132,58 @@ For each endpoint, verify:
 2. Response body structure
 3. Error handling
 4. Authorization requirements
+
+
+
+
+
+Features 
+
+### Authentication
+- [ ] Admin login works with correct credentials
+- [ ] Customer registration works with new email
+- [ ] Professional registration works with new email
+- [ ] Duplicate email registration is prevented
+- [ ] Login fails with incorrect credentials
+- [ ] Tokens are properly generated
+- [ ] Role is correctly included in login response
+
+### Admin Functions
+- [ ] Can view pending professionals
+- [ ] Can approve professionals
+- [ ] Can create service categories
+- [ ] Can create services
+- [ ] Admin-only routes are protected
+
+### Service Management
+- [ ] Services list is accessible
+- [ ] Search works with different criteria
+- [ ] Service details are complete
+- [ ] Categories are properly linked
+
+### Customer Functions
+- [ ] Can create service requests
+- [ ] Can view request status
+- [ ] Can submit reviews
+- [ ] Customer-only routes are protected
+
+### Professional Functions
+- [ ] Can view available requests
+- [ ] Can accept requests
+- [ ] Can complete requests
+- [ ] Can view own reviews
+- [ ] Professional-only routes are protected
+
+### Security
+- [ ] Invalid tokens are rejected
+- [ ] Expired tokens are rejected
+- [ ] Role-based access is enforced
+- [ ] Input validation works
+- [ ] SQL injection is prevented
+
+### Error Handling
+- [ ] 400 Bad Request for invalid input
+- [ ] 401 Unauthorized for invalid tokens
+- [ ] 403 Forbidden for wrong roles
+- [ ] 404 Not Found for missing resources
+- [ ] 500 Server Error is properly handled

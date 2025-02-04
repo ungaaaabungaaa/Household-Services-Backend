@@ -11,7 +11,7 @@ def login():
     user = User.query.filter_by(email=data['email']).first()
     
     if user and bcrypt.check_password_hash(user.password, data['password']):
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
         return jsonify({
             'access_token': access_token,
             'role': user.role
