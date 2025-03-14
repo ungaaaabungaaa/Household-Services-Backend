@@ -6,7 +6,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start:backend": "python app.py"
+    "start:backend": "python app.py",
+    "lint": "eslint --ext .js,.vue src",
+    "format": "prettier --write \"src/**/*.{js,vue}\""
   },
   "dependencies": {
     "vue": "^3.3.4",
@@ -16,11 +18,20 @@
     "bootstrap": "^5.3.1",
     "@popperjs/core": "^2.11.8",
     "chart.js": "^4.3.3",
-    "vue-chartjs": "^5.2.0"
+    "vue-chartjs": "^5.2.0",
+    "bootstrap-icons": "^1.10.5",
+    "moment": "^2.29.4",
+    "vee-validate": "^4.11.1",
+    "yup": "^1.2.0",
+    "vue-toastification": "^2.0.0-rc.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.3.1",
     "vite": "^4.4.9",
-    "sass": "^1.66.1"
+    "sass": "^1.66.1",
+    "eslint": "^8.47.0",
+    "eslint-plugin-vue": "^9.17.0",
+    "prettier": "^3.0.2",
+    "@vue/eslint-config-prettier": "^8.0.0"
   }
 }
