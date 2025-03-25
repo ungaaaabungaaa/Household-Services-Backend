@@ -20,6 +20,25 @@ import ProfessionalReviews from '../views/professional/Reviews.vue';
 
 const routes = [
   {
+    path: '/',
+    redirect: to => {
+      const authStore = useAuthStore();
+      if (!authStore.isLoggedIn) {
+        return '/login';
+      }
+      switch (authStore.userRole) {
+        case 'admin':
+          return '/admin/dashboard';
+        case 'customer':
+          return '/services';
+        case 'professional':
+          return '/professional/requests';
+        default:
+          return '/login';
+      }
+    }
+  },
+  {
     path: '/login',
     name: 'Login',
     component: Login,
@@ -72,6 +91,10 @@ const routes = [
     name: 'ProfessionalReviews',
     component: ProfessionalReviews,
     meta: { requiresAuth: true, role: 'professional' }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
   }
 ];
 
