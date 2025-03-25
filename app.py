@@ -16,13 +16,14 @@ def create_app():
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 86400  # 24 hours
     
     # Initialize extensions
+    CORS(app)
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    CORS(app)
     limiter.init_app(app)
     
     # Import routes
@@ -60,25 +61,25 @@ def create_app():
     def internal_server_error(error):
         return {'error': 'Internal server error', 'message': 'An unexpected error occurred'}, 500
 
-    # Create admin user
-    @app.before_first_request
-    def create_admin():
-        with app.app_context():
-            admin = User.query.filter_by(email='admin@example.com').first()
-            if not admin:
-                admin = User(
-                    email='admin@example.com',
-                    password=bcrypt.generate_password_hash('Admin@123').decode('utf-8'),
-                    name='Admin',
-                    role='admin'
-                )
-                db.session.add(admin)
-                db.session.commit()
-
     return app
 
-if __name__ == '__main__':
-    app = create_app()
+app = create_app()
+
+# Create admin user
+@app.before_first_request
+def create_admin():
     with app.app_context():
         db.create_all()
+        admin = User.query.filter_by(email='admin@example.com').first()
+        if not admin:
+            admin = User(
+                email='admin@example.com',
+                password=bcrypt.generate_password_hash('Admin@123').decode('utf-8'),
+                name='Admin',
+                role='admin'
+            )
+            db.session.add(admin)
+            db.session.commit()
+
+if __name__ == '__main__':
     app.run(debug=True)

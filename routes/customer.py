@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app import db
+from extensions import db
 from models import User, ServiceRequest, Review, Service
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime

@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify
-from app import db, bcrypt
+from extensions import db, bcrypt, jwt, limiter
 from models import User
 from flask_jwt_extended import create_access_token
 from email_validator import validate_email, EmailNotValidError
+from datetime import timedelta
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['POST'])
+@limiter.limit("5 per minute")
 def login():
     data = request.get_json()
     
@@ -16,15 +18,20 @@ def login():
     user = User.query.filter_by(email=data['email']).first()
     
     if user and bcrypt.check_password_hash(user.password, data['password']):
-        access_token = create_access_token(identity=str(user.id))
+        access_token = create_access_token(
+            identity=str(user.id),
+            expires_delta=timedelta(days=1)
+        )
         return jsonify({
             'access_token': access_token,
-            'role': user.role
+            'role': user.role,
+            'name': user.name
         }), 200
     
     return jsonify({'error': 'Invalid credentials'}), 401
 
 @auth_bp.route('/register/customer', methods=['POST'])
+@limiter.limit("3 per minute")
 def register_customer():
     data = request.get_json()
     
@@ -65,6 +72,7 @@ def register_customer():
         return jsonify({'error': 'Registration failed', 'details': str(e)}), 500
 
 @auth_bp.route('/register/professional', methods=['POST'])
+@limiter.limit("3 per minute")
 def register_professional():
     data = request.get_json()
     
