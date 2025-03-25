@@ -70,13 +70,19 @@
             <template v-if="role === 'professional'">
               <div class="mb-3">
                 <label for="service_type" class="form-label">Service Type</label>
-                <input
-                  type="text"
-                  class="form-control"
+                <select
+                  class="form-select"
                   id="service_type"
                   v-model="formData.service_type"
                   required
                 >
+                  <option value="">Select a service type</option>
+                  <option value="Plumbing">Plumbing</option>
+                  <option value="Electrical">Electrical</option>
+                  <option value="Cleaning">Cleaning</option>
+                  <option value="Carpentry">Carpentry</option>
+                  <option value="Painting">Painting</option>
+                </select>
               </div>
               <div class="mb-3">
                 <label for="experience" class="form-label">Experience (years)</label>
@@ -85,6 +91,7 @@
                   class="form-control"
                   id="experience"
                   v-model="formData.experience"
+                  min="0"
                   required
                 >
               </div>
@@ -115,12 +122,14 @@
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
+import { useToast } from 'vue-toastification';
 
 export default {
   name: 'Register',
   setup() {
     const router = useRouter();
     const authStore = useAuthStore();
+    const toast = useToast();
     const role = ref('customer');
     const formData = reactive({
       name: '',
@@ -133,27 +142,31 @@ export default {
     });
 
     const handleRegister = async () => {
-      let success;
-      if (role.value === 'customer') {
-        success = await authStore.registerCustomer({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          pin_code: formData.pin_code
-        });
-      } else {
-        success = await authStore.registerProfessional({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          service_type: formData.service_type,
-          experience: parseInt(formData.experience),
-          description: formData.description
-        });
-      }
+      try {
+        let success;
+        if (role.value === 'customer') {
+          success = await authStore.registerCustomer({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            pin_code: formData.pin_code
+          });
+        } else {
+          success = await authStore.registerProfessional({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            service_type: formData.service_type,
+            experience: parseInt(formData.experience),
+            description: formData.description
+          });
+        }
 
-      if (success) {
-        router.push('/login');
+        if (success) {
+          router.push('/login');
+        }
+      } catch (error) {
+        toast.error('Registration failed. Please try again.');
       }
     };
 

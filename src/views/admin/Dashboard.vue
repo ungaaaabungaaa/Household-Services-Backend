@@ -45,13 +45,13 @@
                 <tbody>
                   <tr v-for="request in recentRequests" :key="request.id">
                     <td>{{ request.id }}</td>
-                    <td>{{ request.service }}</td>
+                    <td>{{ request.service_name }}</td>
                     <td>
                       <span :class="getStatusBadgeClass(request.status)">
                         {{ request.status }}
                       </span>
                     </td>
-                    <td>{{ request.date }}</td>
+                    <td>{{ formatDate(request.created_at) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -63,7 +63,10 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Service Categories Performance</h5>
-            <Bar :data="chartData" :options="chartOptions" />
+            <Bar v-if="chartData.datasets[0].data.length > 0" :data="chartData" :options="chartOptions" />
+            <div v-else class="text-center py-4">
+              <p class="text-muted">No data available</p>
+            </div>
           </div>
         </div>
       </div>
@@ -76,6 +79,8 @@ import { ref, onMounted } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import axios from 'axios';
+import moment from 'moment';
+import { useToast } from 'vue-toastification';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -90,6 +95,7 @@ export default {
     });
 
     const recentRequests = ref([]);
+    const toast = useToast();
 
     const chartData = ref({
       labels: ['Plumbing', 'Electrical', 'Cleaning', 'Carpentry', 'Painting'],
@@ -105,7 +111,15 @@ export default {
       maintainAspectRatio: false,
       scales: {
         y: {
-          beginAtZero: true
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: true
         }
       }
     };
@@ -120,18 +134,23 @@ export default {
       return classes[status] || 'badge bg-secondary';
     };
 
+    const formatDate = (date) => {
+      return moment(date).format('MMM D, YYYY');
+    };
+
     const fetchDashboardData = async () => {
       try {
         const [statsRes, requestsRes, performanceRes] = await Promise.all([
-          axios.get('/api/admin/stats'),
-          axios.get('/api/admin/recent-requests'),
-          axios.get('/api/admin/service-performance')
+          axios.get('/admin/stats'),
+          axios.get('/admin/recent-requests'),
+          axios.get('/admin/service-performance')
         ]);
 
         stats.value = statsRes.data;
         recentRequests.value = requestsRes.data;
         chartData.value.datasets[0].data = performanceRes.data.map(item => item.count);
       } catch (error) {
+        toast.error('Error fetching dashboard data');
         console.error('Error fetching dashboard data:', error);
       }
     };
@@ -145,7 +164,8 @@ export default {
       recentRequests,
       chartData,
       chartOptions,
-      getStatusBadgeClass
+      getStatusBadgeClass,
+      formatDate
     };
   }
 };
